@@ -1,4 +1,4 @@
-#Pacman Project for CS4100 Foundations of Artififial Intelligence
+##Pacman Project for CS4100 Foundations of Artififial Intelligence
 
 This repository contains the files associated with the work I did for the Pacman project
 to practise applying AI techniques to playing the game.
