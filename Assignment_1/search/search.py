@@ -16,8 +16,11 @@
 In search.py, you will implement generic search algorithms which are called by
 Pacman agents (in searchAgents.py).
 """
+from typing import Dict, Any
 
 import util
+from game import Directions
+
 
 class SearchProblem:
     """
@@ -67,10 +70,27 @@ def tinyMazeSearch(problem):
     Returns a sequence of moves that solves tinyMaze.  For any other maze, the
     sequence of moves will be incorrect, so only use this for tinyMaze.
     """
-    from game import Directions
     s = Directions.SOUTH
     w = Directions.WEST
-    return  [s, s, w, s, w, w, s, w]
+    return [s, s, w, s, w, w, s, w]
+
+
+def get_directions_from_map(dir_map, goal, start):
+    string_to_dir = {
+        'South': Directions.SOUTH,
+        'West': Directions.WEST,
+        'North': Directions.NORTH,
+        'East': Directions.EAST
+    }
+
+    list_of_directions = []
+
+    cur_node = goal
+    while cur_node != start:
+        list_of_directions.append(string_to_dir[dir_map[cur_node][1]])
+        cur_node = dir_map[cur_node][0]
+    return list_of_directions
+
 
 def depthFirstSearch(problem):
     """
@@ -87,17 +107,48 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    visited = set()
+    dfs_stack = util.Stack()
+    start = problem.getStartState()
+    successor_node_and_direction = {}
+    goal_found = False
+    goal_state = None
+
+    visited.add(start)
+    dfs_stack.push(start)
+
+    while not dfs_stack.isEmpty() and not goal_found:
+        top = dfs_stack.pop()
+        for successor in problem.getSuccessors(top):
+            location = successor[0]
+            direction = successor[1]
+            if location in visited:
+                continue
+            if problem.isGoalState(location):
+                goal_found = True
+                goal_state = location
+            successor_node_and_direction[location] = (top, direction)
+            if goal_found:
+                break
+            else:
+                dfs_stack.push(location)
+                visited.add(location)
+
+    direction_list = get_directions_from_map(successor_node_and_direction, goal_state, start)
+    return direction_list[::-1]
+
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
     util.raiseNotDefined()
 
+
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
     util.raiseNotDefined()
+
 
 def nullHeuristic(state, problem=None):
     """
@@ -105,6 +156,7 @@ def nullHeuristic(state, problem=None):
     goal in the provided SearchProblem.  This heuristic is trivial.
     """
     return 0
+
 
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
