@@ -183,6 +183,10 @@ class PriorityQueue:
         heapq.heappush(self.heap, entry)
         self.count += 1
 
+    def pop_with_priority(self):
+        (priority, _, item) = heapq.heappop(self.heap)
+        return priority, item
+
     def pop(self):
         (_, _, item) = heapq.heappop(self.heap)
         return item

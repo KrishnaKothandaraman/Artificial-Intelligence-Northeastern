@@ -104,13 +104,12 @@ def depthFirstSearch(problem):
     dfs_stack = util.Stack()
     start = problem.getStartState()
     successor_node_and_direction = {}
-    goal_found = False
     goal_state = None
 
     visited.add(start)
     dfs_stack.push(start)
 
-    while not dfs_stack.isEmpty() and not goal_found:
+    while not dfs_stack.isEmpty() and not goal_state:
         top = dfs_stack.pop()
         for successor in problem.getSuccessors(top):
             location = successor[0]
@@ -118,14 +117,10 @@ def depthFirstSearch(problem):
             if location in visited:
                 continue
             if problem.isGoalState(location):
-                goal_found = True
                 goal_state = location
             successor_node_and_direction[location] = (top, direction)
-            if goal_found:
-                break
-            else:
-                dfs_stack.push(location)
-                visited.add(location)
+            dfs_stack.push(location)
+            visited.add(location)
 
     direction_list = get_directions_from_map(successor_node_and_direction, goal_state, start)
     return direction_list[::-1]
@@ -138,12 +133,11 @@ def breadthFirstSearch(problem):
     bfs_queue = util.Queue()
     start = problem.getStartState()
     successor_node_and_direction = {}
-    goal_found = False
     goal_state = None
 
     visited.add(start)
     bfs_queue.push(start)
-    while not bfs_queue.isEmpty() and not goal_found:
+    while not bfs_queue.isEmpty() and not goal_state:
         top = bfs_queue.pop()
         for successor in problem.getSuccessors(top):
             location = successor[0]
@@ -151,14 +145,10 @@ def breadthFirstSearch(problem):
             if location in visited:
                 continue
             if problem.isGoalState(location):
-                goal_found = True
                 goal_state = location
             successor_node_and_direction[location] = (top, direction)
-            if goal_found:
-                break
-            else:
-                bfs_queue.push(location)
-                visited.add(location)
+            bfs_queue.push(location)
+            visited.add(location)
 
     direction_list = get_directions_from_map(successor_node_and_direction, goal_state, start)
     return direction_list[::-1]
@@ -167,7 +157,36 @@ def breadthFirstSearch(problem):
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    visited = set()
+    ucs_queue = util.PriorityQueue()
+    start = problem.getStartState()
+    successor_node_and_direction = {}
+    goal_state = None
+
+    visited.add(start)
+    ucs_queue.push(start, 0)
+
+    while not ucs_queue.isEmpty() and not goal_state:
+        top = ucs_queue.pop_with_priority()
+        topCost = top[0]
+        topNode = top[1]
+        for successor in problem.getSuccessors(topNode):
+            location = successor[0]
+            direction = successor[1]
+            cost = successor[2]
+            if location in visited:
+                continue
+            if problem.isGoalState(location):
+                goal_state = location
+            successor_node_and_direction[location] = (topNode, direction)
+            ucs_queue.push(location, topCost + cost)
+            visited.add(location)
+
+    direction_list = get_directions_from_map(successor_node_and_direction, goal_state, start)
+    return direction_list[::-1]
+
+    #util.raiseNotDefined()
 
 
 def nullHeuristic(state, problem=None):
