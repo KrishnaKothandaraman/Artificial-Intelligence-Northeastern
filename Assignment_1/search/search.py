@@ -76,18 +76,11 @@ def tinyMazeSearch(problem):
 
 
 def get_directions_from_map(dir_map, goal, start):
-    string_to_dir = {
-        'South': Directions.SOUTH,
-        'West': Directions.WEST,
-        'North': Directions.NORTH,
-        'East': Directions.EAST
-    }
-
     list_of_directions = []
 
     cur_node = goal
     while cur_node != start:
-        list_of_directions.append(string_to_dir[dir_map[cur_node][1]])
+        list_of_directions.append(dir_map[cur_node][1])
         cur_node = dir_map[cur_node][0]
     return list_of_directions
 
@@ -141,7 +134,34 @@ def depthFirstSearch(problem):
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    visited = set()
+    bfs_queue = util.Queue()
+    start = problem.getStartState()
+    successor_node_and_direction = {}
+    goal_found = False
+    goal_state = None
+
+    visited.add(start)
+    bfs_queue.push(start)
+    while not bfs_queue.isEmpty() and not goal_found:
+        top = bfs_queue.pop()
+        for successor in problem.getSuccessors(top):
+            location = successor[0]
+            direction = successor[1]
+            if location in visited:
+                continue
+            if problem.isGoalState(location):
+                goal_found = True
+                goal_state = location
+            successor_node_and_direction[location] = (top, direction)
+            if goal_found:
+                break
+            else:
+                bfs_queue.push(location)
+                visited.add(location)
+
+    direction_list = get_directions_from_map(successor_node_and_direction, goal_state, start)
+    return direction_list[::-1]
 
 
 def uniformCostSearch(problem):
