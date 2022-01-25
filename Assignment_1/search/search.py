@@ -105,22 +105,23 @@ def depthFirstSearch(problem):
     start = problem.getStartState()
     successor_node_and_direction = {}
     goal_state = None
-
-    visited.add(start)
     dfs_stack.push(start)
 
-    while not dfs_stack.isEmpty() and not goal_state:
+    while not dfs_stack.isEmpty():
         top = dfs_stack.pop()
+        if top in visited:
+            continue
+        if problem.isGoalState(top):
+            goal_state = top
+            break
         for successor in problem.getSuccessors(top):
             location = successor[0]
             direction = successor[1]
             if location in visited:
                 continue
-            if problem.isGoalState(location):
-                goal_state = location
             successor_node_and_direction[location] = (top, direction)
             dfs_stack.push(location)
-            visited.add(location)
+        visited.add(top)
 
     direction_list = get_directions_from_map(successor_node_and_direction, goal_state, start)
     return direction_list[::-1]
@@ -134,21 +135,22 @@ def breadthFirstSearch(problem):
     start = problem.getStartState()
     successor_node_and_direction = {}
     goal_state = None
-
-    visited.add(start)
     bfs_queue.push(start)
-    while not bfs_queue.isEmpty() and not goal_state:
+    visited.add(start)
+
+    while not bfs_queue.isEmpty():
         top = bfs_queue.pop()
+        if problem.isGoalState(top):
+            goal_state = top
+            break
         for successor in problem.getSuccessors(top):
             location = successor[0]
             direction = successor[1]
             if location in visited:
                 continue
-            if problem.isGoalState(location):
-                goal_state = location
+            visited.add(location)
             successor_node_and_direction[location] = (top, direction)
             bfs_queue.push(location)
-            visited.add(location)
 
     direction_list = get_directions_from_map(successor_node_and_direction, goal_state, start)
     return direction_list[::-1]
@@ -163,30 +165,37 @@ def uniformCostSearch(problem):
     start = problem.getStartState()
     successor_node_and_direction = {}
     goal_state = None
+    cheapest_cost_to_get_to_node = {}
 
     visited.add(start)
     ucs_queue.push(start, 0)
+    cheapest_cost_to_get_to_node[start] = 0
+    best_solution = float('inf')
 
-    while not ucs_queue.isEmpty() and not goal_state:
+    while not ucs_queue.isEmpty():
         top = ucs_queue.pop_with_priority()
         topCost = top[0]
         topNode = top[1]
+        if topCost >= best_solution:
+            break
+        if problem.isGoalState(topNode):
+            best_solution = topCost
+            goal_state = topNode
+            continue
         for successor in problem.getSuccessors(topNode):
             location = successor[0]
             direction = successor[1]
             cost = successor[2]
-            if location in visited:
-                continue
-            if problem.isGoalState(location):
-                goal_state = location
-            successor_node_and_direction[location] = (topNode, direction)
-            ucs_queue.push(location, topCost + cost)
-            visited.add(location)
+            if location not in visited or cheapest_cost_to_get_to_node[location] > cost + topCost:
+                successor_node_and_direction[location] = (topNode, direction)
+                cheapest_cost_to_get_to_node[location] = cost + topCost
+                visited.add(location)
+                ucs_queue.update(location, topCost + cost)
 
     direction_list = get_directions_from_map(successor_node_and_direction, goal_state, start)
     return direction_list[::-1]
 
-    #util.raiseNotDefined()
+    # util.raiseNotDefined()
 
 
 def nullHeuristic(state, problem=None):
@@ -204,29 +213,31 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     start = problem.getStartState()
     successor_node_and_direction = {}
     goal_state = None
+    cheapest_cost_to_get_to_node = {}
 
     visited.add(start)
     aStar_queue.push(start, 0)
+    cheapest_cost_to_get_to_node[start] = 0
 
-    while not aStar_queue.isEmpty() and not goal_state:
+    while not aStar_queue.isEmpty():
         top = aStar_queue.pop_with_priority()
-        topCost = top[0]
         topNode = top[1]
+        topCost = cheapest_cost_to_get_to_node[topNode]
+        if problem.isGoalState(topNode):
+            goal_state = topNode
+            break
         for successor in problem.getSuccessors(topNode):
             location = successor[0]
             direction = successor[1]
             cost = successor[2]
-            if location in visited:
-                continue
-            if problem.isGoalState(location):
-                goal_state = location
-            successor_node_and_direction[location] = (topNode, direction)
-            aStar_queue.push(location, topCost + cost + heuristic(location, problem))
-            visited.add(location)
+            if location not in visited or cheapest_cost_to_get_to_node[location] > cost + topCost:
+                successor_node_and_direction[location] = (topNode, direction)
+                cheapest_cost_to_get_to_node[location] = cost + topCost
+                visited.add(location)
+                aStar_queue.update(location, topCost + cost + heuristic(location, problem))
 
     direction_list = get_directions_from_map(successor_node_and_direction, goal_state, start)
     return direction_list[::-1]
-    #util.raiseNotDefined()
 
 
 # Abbreviations
