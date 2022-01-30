@@ -76,13 +76,14 @@ def tinyMazeSearch(problem):
 
 
 def get_directions_from_map(dir_map, goal, start):
+    # print(dir_map)
     list_of_directions = []
 
     cur_node = goal
     while cur_node != start:
         list_of_directions.append(dir_map[cur_node][1])
         cur_node = dir_map[cur_node][0]
-    return list_of_directions
+    return list_of_directions[::-1]
 
 
 def depthFirstSearch(problem):
@@ -100,100 +101,73 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    visited = set()
+    visited = []
     dfs_stack = util.Stack()
     start = problem.getStartState()
-    successor_node_and_direction = {}
-    goal_state = None
-    dfs_stack.push(start)
+    dfs_stack.push((start, []))
 
     while not dfs_stack.isEmpty():
-        top = dfs_stack.pop()
+        top, dirs = dfs_stack.pop()
         if top in visited:
             continue
         if problem.isGoalState(top):
-            goal_state = top
-            break
+            return dirs
         for successor in problem.getSuccessors(top):
             location = successor[0]
             direction = successor[1]
             if location in visited:
                 continue
-            successor_node_and_direction[location] = (top, direction)
-            dfs_stack.push(location)
-        visited.add(top)
+            dfs_stack.push((location, dirs + [direction]))
+        visited.append(top)
 
-    direction_list = get_directions_from_map(successor_node_and_direction, goal_state, start)
-    return direction_list[::-1]
+    print("Path not found")
 
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    visited = set()
     bfs_queue = util.Queue()
-    start = problem.getStartState()
-    successor_node_and_direction = {}
-    goal_state = None
-    bfs_queue.push(start)
-    visited.add(start)
-
+    bfs_queue.push((problem.getStartState(), []))
+    visited = []
     while not bfs_queue.isEmpty():
-        top = bfs_queue.pop()
+        top, dirs = bfs_queue.pop()
+        if top in visited:
+            continue
         if problem.isGoalState(top):
-            goal_state = top
-            break
+            return dirs
         for successor in problem.getSuccessors(top):
             location = successor[0]
             direction = successor[1]
             if location in visited:
                 continue
-            visited.add(location)
-            successor_node_and_direction[location] = (top, direction)
-            bfs_queue.push(location)
+            bfs_queue.push((location, dirs + [direction]))
+        visited.append(top)
 
-    direction_list = get_directions_from_map(successor_node_and_direction, goal_state, start)
-    return direction_list[::-1]
+    print("Path not found")
 
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-
-    visited = set()
     ucs_queue = util.PriorityQueue()
-    start = problem.getStartState()
-    successor_node_and_direction = {}
-    goal_state = None
-    cheapest_cost_to_get_to_node = {}
-
-    visited.add(start)
+    start = (problem.getStartState(), [])
     ucs_queue.push(start, 0)
-    cheapest_cost_to_get_to_node[start] = 0
-    best_solution = float('inf')
-
+    visited = []
     while not ucs_queue.isEmpty():
-        top = ucs_queue.pop_with_priority()
-        topCost = top[0]
-        topNode = top[1]
-        if topCost >= best_solution:
-            break
-        if problem.isGoalState(topNode):
-            best_solution = topCost
-            goal_state = topNode
+        top_cost, top = ucs_queue.pop_with_priority()
+        if top[0] in visited:
             continue
-        for successor in problem.getSuccessors(topNode):
+        if problem.isGoalState(top[0]):
+            return top[1]
+        for successor in problem.getSuccessors(top[0]):
             location = successor[0]
             direction = successor[1]
             cost = successor[2]
-            if location not in visited or cheapest_cost_to_get_to_node[location] > cost + topCost:
-                successor_node_and_direction[location] = (topNode, direction)
-                cheapest_cost_to_get_to_node[location] = cost + topCost
-                visited.add(location)
-                ucs_queue.update(location, topCost + cost)
+            if location not in visited:
+                ucs_queue.update((location, top[1] + [direction]), top_cost + cost)
+        visited.append(top[0])
 
-    direction_list = get_directions_from_map(successor_node_and_direction, goal_state, start)
-    return direction_list[::-1]
+    print("Path not found")
 
     # util.raiseNotDefined()
 
@@ -208,36 +182,27 @@ def nullHeuristic(state, problem=None):
 
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    visited = set()
-    aStar_queue = util.PriorityQueue()
-    start = problem.getStartState()
-    successor_node_and_direction = {}
-    goal_state = None
-    cheapest_cost_to_get_to_node = {}
+    aStarQueue = util.PriorityQueue()
+    start = (problem.getStartState(), [])
+    aStarQueue.push(start, 0)
+    visited = [start[0]]
+    cheapest_cost_to_location = {0: heuristic(start[0], problem)}
 
-    visited.add(start)
-    aStar_queue.push(start, 0)
-    cheapest_cost_to_get_to_node[start] = 0
-
-    while not aStar_queue.isEmpty():
-        top = aStar_queue.pop_with_priority()
-        topNode = top[1]
-        topCost = cheapest_cost_to_get_to_node[topNode]
-        if problem.isGoalState(topNode):
-            goal_state = topNode
-            break
-        for successor in problem.getSuccessors(topNode):
+    while not aStarQueue.isEmpty():
+        top = aStarQueue.pop()
+        top_cost = cheapest_cost_to_location[visited.index(top[0])]
+        if problem.isGoalState(top[0]):
+            return top[1]
+        for successor in problem.getSuccessors(top[0]):
             location = successor[0]
             direction = successor[1]
             cost = successor[2]
-            if location not in visited or cheapest_cost_to_get_to_node[location] > cost + topCost:
-                successor_node_and_direction[location] = (topNode, direction)
-                cheapest_cost_to_get_to_node[location] = cost + topCost
-                visited.add(location)
-                aStar_queue.update(location, topCost + cost + heuristic(location, problem))
+            if location not in visited or cheapest_cost_to_location[visited.index(location)] > cost + top_cost:
+                aStarQueue.update((location, top[1] + [direction]), top_cost + cost + heuristic(location, problem))
+                visited.append(location)
+                cheapest_cost_to_location[len(visited) - 1] = cost + top_cost
 
-    direction_list = get_directions_from_map(successor_node_and_direction, goal_state, start)
-    return direction_list[::-1]
+    print("Path not found")
 
 
 # Abbreviations
