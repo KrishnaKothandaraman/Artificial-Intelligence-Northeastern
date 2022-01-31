@@ -198,6 +198,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
             direction = successor[1]
             cost = successor[2]
             if location not in visited or cheapest_cost_to_location[visited.index(location)] > cost + top_cost:
+                #print(f"Location {location}, Heuristic {heuristic(location, problem)}")
                 aStarQueue.update((location, top[1] + [direction]), top_cost + cost + heuristic(location, problem))
                 visited.append(location)
                 cheapest_cost_to_location[len(visited) - 1] = cost + top_cost
