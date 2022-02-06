@@ -513,7 +513,14 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+    heuristicValue = 0
+    foodGrid = foodGrid.asList()
+    while foodGrid:
+        minFood, minDistance = get_closest_corner(position, foodGrid)
+        position = minFood
+        foodGrid.remove(minFood)
+        heuristicValue += minDistance
+    return heuristicValue
 
 
 class ClosestDotSearchAgent(SearchAgent):
@@ -541,12 +548,12 @@ class ClosestDotSearchAgent(SearchAgent):
         """
         # Here are some useful elements of the startState
         startPosition = gameState.getPacmanPosition()
-        food = gameState.getFood()
+        foodList = gameState.getFood().asList()
         walls = gameState.getWalls()
         problem = AnyFoodSearchProblem(gameState)
-
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return search.ucs(problem)
+
 
 
 class AnyFoodSearchProblem(PositionSearchProblem):
@@ -568,6 +575,7 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         "Stores information from the gameState.  You don't need to change this."
         # Store the food for later reference
         self.food = gameState.getFood()
+        self.foodFound = []
 
         # Store info for the PositionSearchProblem (no need to change this)
         self.walls = gameState.getWalls()
@@ -583,7 +591,7 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         x, y = state
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return self.food[x][y]
 
 
 def mazeDistance(point1, point2, gameState):

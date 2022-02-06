@@ -124,6 +124,7 @@ def depthFirstSearch(problem):
 
 
 def breadthFirstSearch(problem):
+    """check about early or late goal test"""
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
     bfs_queue = util.Queue()
