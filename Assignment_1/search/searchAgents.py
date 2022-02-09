@@ -511,16 +511,37 @@ def foodHeuristic(state, problem):
     Subsequent calls to this heuristic can access
     problem.heuristicInfo['wallCount']
     """
+    """
+    Find maze dist to closest food and then maze dist from that food till farthest food. Heuristic is sum
+    of both
+    """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    heuristicValue = 0
-    foodGrid = foodGrid.asList()
-    while foodGrid:
-        minFood, minDistance = get_closest_corner(position, foodGrid)
-        position = minFood
-        foodGrid.remove(minFood)
-        heuristicValue += minDistance
-    return heuristicValue
+    food_list = foodGrid.asList()
+    closest_food_dist = float('inf')
+    closest_food = None
+    heuristic = 0
+    # goal state
+    if len(food_list) == 0:
+        return 0
+    # find maze dist to closest food
+    for food_pos in food_list:
+        maze_dist = mazeDistance(food_pos, position, problem.startingGameState)
+        if maze_dist < closest_food_dist:
+            closest_food_dist = maze_dist
+            closest_food = food_pos
+    heuristic += closest_food_dist
+    position = closest_food
+    farthest_food_dist = float('-inf')
+    # find maze dist to farthest food from closest food
+    for food_pos in food_list:
+        maze_dist = mazeDistance(food_pos, position, problem.startingGameState)
+        farthest_food_dist = max(maze_dist, farthest_food_dist)
+    heuristic += farthest_food_dist
+    return heuristic
+
+
+
 
 
 class ClosestDotSearchAgent(SearchAgent):
