@@ -1,4 +1,4 @@
-#Project 1 - Search
+# Project 1 - Search
 
 This project was oriented towards writing search algorithms, heuristic creations and game state definitions.
 
