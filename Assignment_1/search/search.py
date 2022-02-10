@@ -151,11 +151,11 @@ def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
     ucs_queue = util.PriorityQueue()
-    start = (problem.getStartState(), [])
+    start = (problem.getStartState(), [], 0)
     ucs_queue.push(start, 0)
     visited = []
     while not ucs_queue.isEmpty():
-        top_cost, top = ucs_queue.pop_with_priority()
+        top = ucs_queue.pop()
         if top[0] in visited:
             continue
         if problem.isGoalState(top[0]):
@@ -165,7 +165,7 @@ def uniformCostSearch(problem):
             direction = successor[1]
             cost = successor[2]
             if location not in visited:
-                ucs_queue.update((location, top[1] + [direction]), top_cost + cost)
+                ucs_queue.update((location, top[1] + [direction], top[2] + cost), top[2] + cost)
         visited.append(top[0])
 
     print("Path not found")
