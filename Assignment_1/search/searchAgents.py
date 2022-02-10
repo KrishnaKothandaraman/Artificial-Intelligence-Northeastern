@@ -526,7 +526,11 @@ def foodHeuristic(state, problem):
         return 0
     # find maze dist to closest food
     for food_pos in food_list:
-        maze_dist = mazeDistance(food_pos, position, problem.startingGameState)
+        if (position, food_pos) in problem.heuristicInfo:
+            maze_dist = problem.heuristicInfo[(position, food_pos)]
+        else:
+            maze_dist = mazeDistance(food_pos, position, problem.startingGameState)
+            problem.heuristicInfo[(position, food_pos)] = maze_dist
         if maze_dist < closest_food_dist:
             closest_food_dist = maze_dist
             closest_food = food_pos
@@ -535,13 +539,14 @@ def foodHeuristic(state, problem):
     farthest_food_dist = float('-inf')
     # find maze dist to farthest food from closest food
     for food_pos in food_list:
-        maze_dist = mazeDistance(food_pos, position, problem.startingGameState)
+        if (position, food_pos) in problem.heuristicInfo:
+            maze_dist = problem.heuristicInfo[(position, food_pos)]
+        else:
+            maze_dist = mazeDistance(food_pos, position, problem.startingGameState)
+            problem.heuristicInfo[(position, food_pos)] = maze_dist
         farthest_food_dist = max(maze_dist, farthest_food_dist)
     heuristic += farthest_food_dist
     return heuristic
-
-
-
 
 
 class ClosestDotSearchAgent(SearchAgent):
