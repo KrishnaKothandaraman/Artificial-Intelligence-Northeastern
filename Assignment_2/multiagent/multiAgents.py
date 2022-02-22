@@ -18,6 +18,31 @@ import random, util
 
 from game import Agent
 
+
+def getManhattanDistance(s1, s2):
+    return abs(s1[0] - s2[0]) + abs(s1[1] - s2[1])
+
+
+def getClosestFromList(listOfPositions, referencePosition):
+    """
+    Returns the index of manhattan distance from the listOfPositions to referencePosition
+
+    :param listOfPositions: Iterable of tuples
+    :param referencePosition: Position to calculate distance from
+    :return: 0-based index from listOfPositions
+    """
+    minIdx = 0
+    minDist = float('inf')
+
+    for i in range(len(listOfPositions)):
+        curDist = getManhattanDistance(referencePosition, listOfPositions[i])
+        if curDist < minDist:
+            minIdx = i
+            minDist = curDist
+
+    return minIdx
+
+
 class ReflexAgent(Agent):
     """
     A reflex agent chooses an action at each choice point by examining
@@ -27,7 +52,6 @@ class ReflexAgent(Agent):
     it in any way you see fit, so long as you don't touch our method
     headers.
     """
-
 
     def getAction(self, gameState):
         """
@@ -45,7 +69,7 @@ class ReflexAgent(Agent):
         scores = [self.evaluationFunction(gameState, action) for action in legalMoves]
         bestScore = max(scores)
         bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
-        chosenIndex = random.choice(bestIndices) # Pick randomly among the best
+        chosenIndex = random.choice(bestIndices)  # Pick randomly among the best
 
         "Add more of your code here if you want to"
 
@@ -70,21 +94,24 @@ class ReflexAgent(Agent):
         Reward moves that eat food or move closer towards food
         """
         # Useful information you can extract from a GameState (pacman.py)
+        currentPosition = currentGameState.getPacmanPosition()
         successorGameState = currentGameState.generatePacmanSuccessor(action)
         newPos = successorGameState.getPacmanPosition()
-        newFood = successorGameState.getFood()
+        newFoodList = successorGameState.getFood().asList()
+        oldFoodList = currentGameState.getFood().asList()
         newGhostStates = successorGameState.getGhostStates()
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
-        print(f"Action {action}")
-        print(f"SuccessorGameState: {successorGameState}")
-        print(f"newPos: {newPos}")
-        print(f"newFood: {newFood.asList()}")
-        print(f"NewGhostStates: {newGhostStates}")
-        print(f"newGhostPosition: {successorGameState.getGhostPositions()}")
-        print(f"newScaredTimes: {newScaredTimes}")
-
+        ghostPositions = successorGameState.getGhostPositions()
         "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+
+        distToClosestGhost = getManhattanDistance(ghostPositions[getClosestFromList(ghostPositions, currentPosition)], newPos)
+        if distToClosestGhost <= 1 or successorGameState.hasWall(newPos[0], newPos[1]):
+            return float('-inf')
+
+        return -1 * getManhattanDistance(oldFoodList[getClosestFromList(oldFoodList, newPos)], newPos)
+
+        # return successorGameState.getScore()
+
 
 def scoreEvaluationFunction(currentGameState):
     """
@@ -95,6 +122,7 @@ def scoreEvaluationFunction(currentGameState):
     (not reflex agents).
     """
     return currentGameState.getScore()
+
 
 class MultiAgentSearchAgent(Agent):
     """
@@ -111,10 +139,11 @@ class MultiAgentSearchAgent(Agent):
     is another abstract class.
     """
 
-    def __init__(self, evalFn = 'scoreEvaluationFunction', depth = '2'):
-        self.index = 0 # Pacman is always agent index 0
+    def __init__(self, evalFn='scoreEvaluationFunction', depth='2'):
+        self.index = 0  # Pacman is always agent index 0
         self.evaluationFunction = util.lookup(evalFn, globals())
         self.depth = int(depth)
+
 
 class MinimaxAgent(MultiAgentSearchAgent):
     """
@@ -147,6 +176,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         "*** YOUR CODE HERE ***"
         util.raiseNotDefined()
 
+
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
     Your minimax agent with alpha-beta pruning (question 3)
@@ -158,6 +188,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         """
         "*** YOUR CODE HERE ***"
         util.raiseNotDefined()
+
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
@@ -174,6 +205,7 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         "*** YOUR CODE HERE ***"
         util.raiseNotDefined()
 
+
 def betterEvaluationFunction(currentGameState):
     """
     Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
@@ -183,6 +215,7 @@ def betterEvaluationFunction(currentGameState):
     """
     "*** YOUR CODE HERE ***"
     util.raiseNotDefined()
+
 
 # Abbreviation
 better = betterEvaluationFunction
