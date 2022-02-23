@@ -221,7 +221,48 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        _, action = self.max_value(gameState, 0, 0, float('-inf'), float('inf'))
+        return action
+
+    def max_value(self, gameState, depth, agentIndex, alpha, beta):
+        if gameState.isWin() or gameState.isLose() or depth == self.depth:
+            return self.evaluationFunction(gameState), None
+
+        maxVal = float('-inf')
+        maxAction = None
+
+        for action in gameState.getLegalActions(agentIndex):
+            successorState = gameState.generateSuccessor(agentIndex, action)
+            minVal, minAction = self.min_value(successorState, depth, 1, alpha, beta)
+            if minVal > beta:
+                return minVal, action
+            if minVal > maxVal:
+                maxVal, maxAction = minVal, action
+                alpha = max(alpha, maxVal)
+        return maxVal, maxAction
+
+    def min_value(self, gameState, depth, agentIndex, alpha, beta):
+        if gameState.isWin() or gameState.isLose() or depth == self.depth:
+            return self.evaluationFunction(gameState), None
+
+        minVal = float('inf')
+        minAction = None
+
+        for action in gameState.getLegalActions(agentIndex):
+            successorState = gameState.generateSuccessor(agentIndex, action)
+            nextAgent = (agentIndex + 1) % gameState.getNumAgents()
+            # pacman needs to move now
+            if nextAgent == 0:
+                val, nextAction = self.max_value(successorState, depth + 1, nextAgent, alpha, beta)
+            else:
+                val, nextAction = self.min_value(successorState, depth, nextAgent, alpha, beta)
+            if val < alpha:
+                return val, action
+            if val < minVal:
+                minVal, minAction = val, action
+                beta = min(beta, minVal)
+
+        return minVal, minAction
 
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
