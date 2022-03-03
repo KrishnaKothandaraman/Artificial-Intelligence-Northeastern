@@ -19,7 +19,7 @@ import random, util
 from game import Agent
 
 
-def getManhattanDistance(s1, s2):
+def getManhattanDistance(s1: object, s2: object) -> object:
     return abs(s1[0] - s2[0]) + abs(s1[1] - s2[1])
 
 
@@ -328,29 +328,33 @@ def betterEvaluationFunction(currentGameState):
     if currentGameState.isWin():
         return currentGameState.getScore()\
 
-    foodBonus = 0
-
     ghostScaredTimers = [ghost.scaredTimer for ghost in ghostStates]
 
     scaredGhosts = [ghostState for ghostState, scaredTimer in
                     zip(ghostStates, ghostScaredTimers) if scaredTimer > 1]
+    scaredGhostPositions = [ghostState.getPosition() for ghostState in scaredGhosts]
+
     unScaredGhosts = [ghostState for ghostState, scaredTimer in
                       zip(ghostStates, ghostScaredTimers) if scaredTimer <= 1]
+
+    unScaredGhostPositions = [ghostState.getPosition() for ghostState in unScaredGhosts]
     distFromScaredGhosts = [getManhattanDistance(ghost.getPosition(), currentPosition) for ghost in scaredGhosts]
     distFromUnScaredGhosts = [getManhattanDistance(ghost.getPosition(), currentPosition) for ghost in unScaredGhosts]
 
-    ghostPenalty = 10/(sum(distFromUnScaredGhosts) + 1)
-    ghostBonus = 5/(sum(distFromScaredGhosts) + 1)
+    ghostPenalty = sum(10/ghostDist for ghostDist in distFromUnScaredGhosts)
+    ghostBonus = 0
+    if currentPosition in scaredGhostPositions:
+        ghostBonus += 100
+    ghostBonus += sum(10/ghostDist for ghostDist in distFromScaredGhosts)
 
-    closestFood = getClosestFromList(foodList, currentPosition)
     foodDistances = [getManhattanDistance(foodPos, currentPosition) for foodPos in foodList]
     if currentPosition in foodList:
         foodBonus = 100 + 1/(len(foodList) + 1)
     else:
         foodBonus = sum(10/foodDist for foodDist in sorted(foodDistances)[:5])
 
-    capsuleBonus = 10/(len(currentGameState.getCapsules()) + 1)
-
+    capsules = currentGameState.getCapsules()
+    capsuleBonus = 500/(len(capsules)**2 + 1)
     return foodBonus - ghostPenalty + currentGameState.getScore() + capsuleBonus + ghostBonus
 
 
