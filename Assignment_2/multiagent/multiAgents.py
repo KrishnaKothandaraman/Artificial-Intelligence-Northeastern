@@ -326,7 +326,7 @@ def betterEvaluationFunction(currentGameState):
     if currentGameState.isLose() or currentPosition in ghostPositions:
         return float('-inf')
     if currentGameState.isWin():
-        return currentGameState.getScore()\
+        return currentGameState.getScore()
 
     ghostScaredTimers = [ghost.scaredTimer for ghost in ghostStates]
 
@@ -341,20 +341,20 @@ def betterEvaluationFunction(currentGameState):
     distFromScaredGhosts = [getManhattanDistance(ghost.getPosition(), currentPosition) for ghost in scaredGhosts]
     distFromUnScaredGhosts = [getManhattanDistance(ghost.getPosition(), currentPosition) for ghost in unScaredGhosts]
 
-    ghostPenalty = sum(10/ghostDist for ghostDist in distFromUnScaredGhosts)
+    ghostPenalty = sum(10 / ghostDist for ghostDist in distFromUnScaredGhosts)
     ghostBonus = 0
     if currentPosition in scaredGhostPositions:
         ghostBonus += 100
-    ghostBonus += sum(10/ghostDist for ghostDist in distFromScaredGhosts)
+    ghostBonus += sum(120 / ghostDist for ghostDist in distFromScaredGhosts)
 
     foodDistances = [getManhattanDistance(foodPos, currentPosition) for foodPos in foodList]
     if currentPosition in foodList:
-        foodBonus = 100 + 1/(len(foodList) + 1)
+        foodBonus = 100 + 1 / (len(foodList) + 1)
     else:
-        foodBonus = sum(10/foodDist for foodDist in sorted(foodDistances)[:5])
+        foodBonus = sum(10 / foodDist for foodDist in sorted(foodDistances)[:5])
 
     capsules = currentGameState.getCapsules()
-    capsuleBonus = 500/(len(capsules)**2 + 1)
+    capsuleBonus = 500 / (len(capsules) ** 2 + 1)
     return foodBonus - ghostPenalty + currentGameState.getScore() + capsuleBonus + ghostBonus
 
 
