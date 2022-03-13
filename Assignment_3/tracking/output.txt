@@ -1,0 +1,152 @@
+Trying:
+    dist = DiscreteDistribution()
+Expecting nothing
+ok
+Trying:
+    dist['a'] = 1
+Expecting nothing
+ok
+Trying:
+    dist['b'] = 2
+Expecting nothing
+ok
+Trying:
+    dist['c'] = 2
+Expecting nothing
+ok
+Trying:
+    dist['d'] = 0
+Expecting nothing
+ok
+Trying:
+    dist.normalize()
+Expecting nothing
+ok
+Trying:
+    list(sorted(dist.items()))
+Expecting:
+    [('a', 0.2), ('b', 0.4), ('c', 0.4), ('d', 0.0)]
+ok
+Trying:
+    dist['e'] = 4
+Expecting nothing
+ok
+Trying:
+    list(sorted(dist.items()))
+Expecting:
+    [('a', 0.2), ('b', 0.4), ('c', 0.4), ('d', 0.0), ('e', 4)]
+ok
+Trying:
+    empty = DiscreteDistribution()
+Expecting nothing
+ok
+Trying:
+    empty.normalize()
+Expecting nothing
+ok
+Trying:
+    empty
+Expecting:
+    {}
+ok
+Trying:
+    dist = DiscreteDistribution()
+Expecting nothing
+ok
+Trying:
+    dist['a'] = 1
+Expecting nothing
+ok
+Trying:
+    dist['b'] = 2
+Expecting nothing
+ok
+Trying:
+    dist['c'] = 2
+Expecting nothing
+ok
+Trying:
+    dist['d'] = 0
+Expecting nothing
+ok
+Trying:
+    N = 100000.0
+Expecting nothing
+ok
+Trying:
+    samples = [dist.sample() for _ in range(int(N))]
+Expecting nothing
+ok
+Trying:
+    round(samples.count('a') * 1.0/N, 1)  # proportion of 'a'
+Expecting:
+    0.2
+ok
+Trying:
+    round(samples.count('b') * 1.0/N, 1)
+Expecting:
+    0.4
+ok
+Trying:
+    round(samples.count('c') * 1.0/N, 1)
+Expecting:
+    0.4
+ok
+Trying:
+    round(samples.count('d') * 1.0/N, 1)
+Expecting:
+    0.0
+ok
+46 items had no tests:
+    inference
+    inference.DiscreteDistribution
+    inference.DiscreteDistribution.__getitem__
+    inference.DiscreteDistribution.argMax
+    inference.DiscreteDistribution.copy
+    inference.DiscreteDistribution.total
+    inference.ExactInference
+    inference.ExactInference.elapseTime
+    inference.ExactInference.getBeliefDistribution
+    inference.ExactInference.initializeUniformly
+    inference.ExactInference.observeUpdate
+    inference.InferenceModule
+    inference.InferenceModule.__init__
+    inference.InferenceModule.elapseTime
+    inference.InferenceModule.getBeliefDistribution
+    inference.InferenceModule.getJailPosition
+    inference.InferenceModule.getObservationProb
+    inference.InferenceModule.getPositionDistribution
+    inference.InferenceModule.getPositionDistributionHelper
+    inference.InferenceModule.initialize
+    inference.InferenceModule.initializeUniformly
+    inference.InferenceModule.observe
+    inference.InferenceModule.observeUpdate
+    inference.InferenceModule.setGhostPosition
+    inference.InferenceModule.setGhostPositions
+    inference.JointParticleFilter
+    inference.JointParticleFilter.__init__
+    inference.JointParticleFilter.addGhostAgent
+    inference.JointParticleFilter.elapseTime
+    inference.JointParticleFilter.getJailPosition
+    inference.JointParticleFilter.initialize
+    inference.JointParticleFilter.initializeUniformly
+    inference.JointParticleFilter.observe
+    inference.JointParticleFilter.observeUpdate
+    inference.MarginalInference
+    inference.MarginalInference.elapseTime
+    inference.MarginalInference.getBeliefDistribution
+    inference.MarginalInference.initializeUniformly
+    inference.MarginalInference.observe
+    inference.ParticleFilter
+    inference.ParticleFilter.__init__
+    inference.ParticleFilter.elapseTime
+    inference.ParticleFilter.getBeliefDistribution
+    inference.ParticleFilter.initializeUniformly
+    inference.ParticleFilter.observeUpdate
+    inference.ParticleFilter.setNumParticles
+2 items passed all tests:
+  12 tests in inference.DiscreteDistribution.normalize
+  11 tests in inference.DiscreteDistribution.sample
+23 tests in 48 items.
+23 passed and 0 failed.
+Test passed.
