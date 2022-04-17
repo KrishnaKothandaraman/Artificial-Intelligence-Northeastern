@@ -192,11 +192,10 @@ class PrioritizedSweepingValueIterationAgent(AsynchronousValueIterationAgent):
         ValueIterationAgent.__init__(self, mdp, discount, iterations)
 
     def runValueIteration(self):
-        "*** YOUR CODE HERE ***"
-
+        """*** YOUR CODE HERE ***"""
         states = self.mdp.getStates()
 
-        # build predecessors
+        # compute predecessors
         predecessors = {s: [] for s in states}
         for state in states:
             for action in self.mdp.getPossibleActions(state):
@@ -207,13 +206,13 @@ class PrioritizedSweepingValueIterationAgent(AsynchronousValueIterationAgent):
         pq = util.PriorityQueue()
         # build priority queue
         for state in states:
-            actions = self.mdp.getPossibleActions(state)
 
-            if not actions:
+            if self.mdp.isTerminal(state):
                 continue
+
             bestAction = self.computeActionFromValues(state)
             maxVal = self.computeQValueFromValues(state, bestAction)
-            diff = self.values[state] - maxVal
+            diff = abs(self.getValue(state) - maxVal)
 
             pq.push(state, -diff)
 
@@ -221,17 +220,19 @@ class PrioritizedSweepingValueIterationAgent(AsynchronousValueIterationAgent):
             if pq.isEmpty():
                 break
             state = pq.pop()
-            bestAction = self.computeActionFromValues(state)
-            if not bestAction:
+            if self.mdp.isTerminal(state):
                 continue
+
+            bestAction = self.computeActionFromValues(state)
             self.values[state] = self.computeQValueFromValues(state, bestAction)
+
             for predecessor in predecessors[state]:
-                current_value = self.getValue(predecessor)
                 best_action = self.computeActionFromValues(predecessor)
+
                 if not best_action:
                     continue
-                val = self.computeQValueFromValues(predecessor, best_action)
-                diff = abs(current_value - val)
+
+                diff = abs(self.getValue(predecessor) - self.computeQValueFromValues(predecessor, best_action))
                 if diff > self.theta:
                     pq.update(predecessor, -diff)
 
