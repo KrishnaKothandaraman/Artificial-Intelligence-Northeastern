@@ -41,6 +41,7 @@ class ValueIterationAgent(ValueEstimationAgent):
         for a given number of iterations using the supplied
         discount factor.
     """
+    mdp: mdp
 
     def __init__(self, mdp, discount=0.9, iterations=100):
         """
@@ -139,7 +140,7 @@ class AsynchronousValueIterationAgent(ValueIterationAgent):
         for a given number of iterations using the supplied
         discount factor.
     """
-
+    mdp: mdp
     def __init__(self, mdp, discount=0.9, iterations=1000):
         """
           Your cyclic value iteration agent should take an mdp on
@@ -171,7 +172,6 @@ class AsynchronousValueIterationAgent(ValueIterationAgent):
                 self.values[state] = self.computeQValueFromValues(state, action)
 
 
-
 class PrioritizedSweepingValueIterationAgent(AsynchronousValueIterationAgent):
     """
         * Please read learningAgents.py before reading this.*
@@ -180,8 +180,9 @@ class PrioritizedSweepingValueIterationAgent(AsynchronousValueIterationAgent):
         (see mdp.py) on initialization and runs prioritized sweeping value iteration
         for a given number of iterations using the supplied parameters.
     """
+    mdp: mdp
 
-    def __init__(self, mdp, discount=0.9, iterations=100, theta=1e-5):
+    def __init__(self, mdp : mdp, discount=0.9, iterations=100, theta=1e-5):
         """
           Your prioritized sweeping value iteration agent should take an mdp on
           construction, run the indicated number of iterations,
@@ -192,3 +193,52 @@ class PrioritizedSweepingValueIterationAgent(AsynchronousValueIterationAgent):
 
     def runValueIteration(self):
         "*** YOUR CODE HERE ***"
+
+        states = self.mdp.getStates()
+
+        # build predecessors
+        predecessors = {s: [] for s in states}
+        for state in states:
+            for action in self.mdp.getPossibleActions(state):
+                for successor, p in self.mdp.getTransitionStatesAndProbs(state, action):
+                    if p > 0:
+                        predecessors[successor].append(state)
+
+        pq = util.PriorityQueue()
+        # build priority queue
+        for state in states:
+            actions = self.mdp.getPossibleActions(state)
+
+            if not actions:
+                continue
+            bestAction = self.computeActionFromValues(state)
+            maxVal = self.computeQValueFromValues(state, bestAction)
+            diff = self.values[state] - maxVal
+
+            pq.push(state, -diff)
+
+        for i in range(self.iterations):
+            if pq.isEmpty():
+                break
+            state = pq.pop()
+            bestAction = self.computeActionFromValues(state)
+            if not bestAction:
+                continue
+            self.values[state] = self.computeQValueFromValues(state, bestAction)
+            for predecessor in predecessors[state]:
+                current_value = self.getValue(predecessor)
+                best_action = self.computeActionFromValues(predecessor)
+                if not best_action:
+                    continue
+                val = self.computeQValueFromValues(predecessor, best_action)
+                diff = abs(current_value - val)
+                if diff > self.theta:
+                    pq.update(predecessor, -diff)
+
+
+
+
+
+
+
+
