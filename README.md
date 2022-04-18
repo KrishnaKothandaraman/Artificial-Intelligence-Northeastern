@@ -1,4 +1,4 @@
-# Pacman Project for CS4100 Foundations of Artififial Intelligence
+# Pacman Project for CS4100 Foundations of Artififial Intelligence at Northeastern University Boston
 
 This repository contains the files associated with the work I did for the Pacman project
 to practice applying AI techniques in a challenging environment.
