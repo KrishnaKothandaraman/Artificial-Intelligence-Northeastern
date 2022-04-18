@@ -38,6 +38,8 @@ __Note: Developed second fastest path finding heuristic in my class__
 - MiniMax with Alpha Beta Pruning
 - ExpectiMax
 
+__Note: State evaluation function placed second in my class for max score in a game of pacman__
+
 #### State evaluation function
 
 Also developed a state evaluation function for a game of Pacman that takes into account several factors like
@@ -51,6 +53,17 @@ Also developed a state evaluation function for a game of Pacman that takes into 
 #### Algorithms implemented
 - Bayesian Networks
 - Probabilistic inference
+
+### Project 4 - Reinforcement Learning
+
+Implemented several RL techniques to create a game agent capable of learning its environment and finding optimal 
+actions and policy.
+- Value Iteration
+- Q Learning
+- Policy iteration
+- Approximate Q Learning
+- Epsilon Greedy action selection
+- Prioritised Sweeping Value Iteration
 
 
 
